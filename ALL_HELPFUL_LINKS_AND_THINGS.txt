@@ -1,0 +1,19 @@
+LMS ACCESS LINK: https://techsaksham.org/login
+username: jayantiwari2603@gmail.com
+Password: Test@1234
+
+"LMS PORTAL WILL BE ACCESSIBLE ONLY FOR 1 YEAR"
+
+"IN LMS ALL THINGS YOU CAN FOR YOUR JOB PREPARATION"
+
+1ST LECTURE: https://youtu.be/Iom9v7pMf3Y?list=PL_iOxYoQ-pUat4FKWs2SJyp4UupQ8Kt7h
+2ND LECTURE: https://youtu.be/1c4hUNkPQlo?list=PL_iOxYoQ-pUat4FKWs2SJyp4UupQ8Kt7h
+3RD LECTURE: https://youtu.be/tcyH_alAgP4?list=PL_iOxYoQ-pUat4FKWs2SJyp4UupQ8Kt7h
+4TH LECTURE: 
+
+HELPFUL TIPS : 
+1.IF YOU ARE GETTING ERROR REGARDING THE RUNNING OF THE JUPYTER NOTEBOOK CELLS:
+ANS. OPEN NEW TERMINAL-> TYPE conda create -p myenv python=3.10->CLICK ENTER
+     TYPE ->y
+
+2. https://docs.streamlit.io/   : Its a framework for creating the best app used by data scientist, data engineers
