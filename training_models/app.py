@@ -1,21 +1,25 @@
 import streamlit as st
 import pickle
 import numpy as np
+import os
 
 # Set page configuration (Must be the first command)
 st.set_page_config(page_title="Disease Prediction System", layout="wide")
 
 # Load trained models
+import os
+
 @st.cache_data
 def load_models():
-    with open("diabetes_model.sav", "rb") as f:
+    base_path = "C:/Users/hp/Desktop/DISEASE OUTBREAKS/training_models/"
+    with open(os.path.join(base_path, "diabetes_model.sav"), "rb") as f:
         diabetes_model = pickle.load(f)
-    with open("heartmodel.sav", "rb") as f:
+    with open(os.path.join(base_path, "heartmodel.sav"), "rb") as f:
         heart_model = pickle.load(f)
-    with open("parkinsons_model.pkl", "rb") as f:
+    with open(os.path.join(base_path, "parkinsons_model.pkl"), "rb") as f:
         parkinsons_model = pickle.load(f)
-    
     return diabetes_model, heart_model, parkinsons_model
+
 
 diabetes_model, heart_model, parkinsons_model = load_models()
 
