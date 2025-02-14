@@ -7,10 +7,26 @@ from streamlit_option_menu import option_menu
 # Set page configuration
 st.set_page_config(page_title='Disease Prediction System', layout='wide', page_icon='🩺')
 
-# Load trained models
-diabetes_model = pickle.load(open(r'C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\diabetes_model.sav', 'rb'))
-heart_disease_model = pickle.load(open(r'C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\heartmodel.sav', 'rb'))
-parkinsons_model = joblib.load(r'C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\parkinsons_model.pkl')
+# Function to load models safely
+def load_model(path):
+    try:
+        with open(path, "rb") as file:
+            return pickle.load(file)  # Try pickle first
+    except (pickle.UnpicklingError, EOFError):
+        return joblib.load(path)  # Try joblib as fallback
+    except Exception as e:
+        st.error(f"❌ Error loading model {path}: {e}")
+        return None
+
+# Define model paths
+model_paths = {
+    "Diabetes": r"C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\diabetes_model.sav",
+    "Heart Disease": r"C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\heartmodel.sav",
+    "Parkinson's": r"C:\Users\hp\Desktop\DISEASE OUTBREAKS\training_models\parkinsons_model.pkl"
+}
+
+# Load models
+models = {disease: load_model(path) for disease, path in model_paths.items()}
 
 # Sidebar Menu
 with st.sidebar:
@@ -20,7 +36,7 @@ with st.sidebar:
                            icons=['activity', 'heart', 'person'], 
                            default_index=0)
 
-# -------------------------------stre
+# -------------------------------
 # Diabetes Prediction Section
 # -------------------------------
 if selected == 'Diabetes Prediction':
@@ -45,22 +61,18 @@ if selected == 'Diabetes Prediction':
     with col2:
         Age = st.text_input('Age of the person')
 
-    diab_diagnosis = ''
-
     if st.button('Diabetes Test Result'):
         try:
             user_input = [float(Pregnancies or 0), float(Glucose or 0), float(BloodPressure or 0), 
                           float(SkinThickness or 0), float(Insulin or 0), float(BMI or 0), 
                           float(DiabetesPedigreeFunction or 0), float(Age or 0)]
 
-            diab_prediction = diabetes_model.predict([user_input])
-
-            diab_diagnosis = '🚨 The person is diabetic' if diab_prediction[0] == 1 else '✅ The person is not diabetic'
+            diab_prediction = models["Diabetes"].predict([user_input])
+            result = '🚨 The person is diabetic' if diab_prediction[0] == 1 else '✅ The person is not diabetic'
+            st.success(result)
 
         except ValueError:
-            diab_diagnosis = '⚠️ Please enter valid numerical values'
-
-        st.success(diab_diagnosis)
+            st.error('⚠️ Please enter valid numerical values')
 
 # -------------------------------
 # Heart Disease Prediction Section
@@ -68,7 +80,6 @@ if selected == 'Diabetes Prediction':
 elif selected == 'Heart Disease Prediction':
     st.title('❤️ Heart Disease Prediction using ML')
 
-    # Define the correct feature order based on dataset
     heart_features = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 
                       'restecg', 'thalach', 'exang', 'oldpeak', 
                       'slope', 'ca', 'thal']
@@ -77,33 +88,22 @@ elif selected == 'Heart Disease Prediction':
 
     col1, col2, col3 = st.columns(3)
     for i, feature in enumerate(heart_features):
-        with [col1, col2, col3][i % 3]:  # Distribute inputs across columns
+        with [col1, col2, col3][i % 3]:  
             user_inputs.append(st.text_input(feature))
-
-    heart_diagnosis = ''
 
     if st.button('Heart Disease Test Result'):
         try:
-            # Debugging: Print raw inputs
-            st.write("🔍 Raw User Inputs:", user_inputs)
-
-            # Convert inputs to float and strip any spaces
             user_input = [float(x.strip()) if x.strip() else 0 for x in user_inputs]
 
-            # Debugging: Check converted values
-            st.write("✅ Converted Inputs:", user_input)
-
-            # Ensure correct input size
             if len(user_input) != 13:
                 st.error(f"❌ Incorrect input count! Expected 13, got {len(user_input)}")
             else:
-                heart_prediction = heart_disease_model.predict([user_input])
-                heart_diagnosis = '🚨 The person is likely to have heart disease' if heart_prediction[0] == 1 else '✅ The person is not likely to have heart disease'
-                st.success(heart_diagnosis)
+                heart_prediction = models["Heart Disease"].predict([user_input])
+                result = '🚨 The person is likely to have heart disease' if heart_prediction[0] == 1 else '✅ The person is not likely to have heart disease'
+                st.success(result)
 
-        except ValueError as e:
-            st.error(f'⚠️ Please enter only numerical values. Error: {e}')
-
+        except ValueError:
+            st.error('⚠️ Please enter only numerical values.')
 
 # -------------------------------
 # Parkinson's Disease Prediction Section
@@ -111,7 +111,6 @@ elif selected == 'Heart Disease Prediction':
 elif selected == "Parkinson's Prediction":
     st.title("🧠 Parkinson's Disease Prediction using ML")
 
-    # Correct feature order based on dataset
     parkinsons_features = [
         'MDVP:Fo(Hz)', 'MDVP:Fhi(Hz)', 'MDVP:Flo(Hz)', 'MDVP:Jitter(%)', 'MDVP:Jitter(Abs)',
         'MDVP:RAP', 'MDVP:PPQ', 'Jitter:DDP', 'MDVP:Shimmer', 'MDVP:Shimmer(dB)', 
@@ -123,22 +122,19 @@ elif selected == "Parkinson's Prediction":
 
     col1, col2, col3 = st.columns(3)
     for i, feature in enumerate(parkinsons_features):
-        with [col1, col2, col3][i % 3]:  # Distribute inputs across columns
+        with [col1, col2, col3][i % 3]:  
             user_inputs.append(st.text_input(feature))
-
-    parkinsons_diagnosis = ''
 
     if st.button("Parkinson's Test Result"):
         try:
             user_input = [float(x.strip() or 0) for x in user_inputs]
 
-            # Ensure correct number of features
             if len(user_input) != 22:
                 st.error(f"❌ Incorrect input count! Expected 22, got {len(user_input)}")
             else:
-                parkinsons_prediction = parkinsons_model.predict([user_input])
-                parkinsons_diagnosis = '🚨 The person is likely to have Parkinson’s disease' if parkinsons_prediction[0] == 1 else '✅ The person is not likely to have Parkinson’s disease'
-                st.success(parkinsons_diagnosis)
+                parkinsons_prediction = models["Parkinson's"].predict([user_input])
+                result = '🚨 The person is likely to have Parkinson’s disease' if parkinsons_prediction[0] == 1 else '✅ The person is not likely to have Parkinson’s disease'
+                st.success(result)
 
         except ValueError:
-            st.error('⚠️ Please enter only numerical values')
+            st.error('⚠️ Please enter only numerical values.')
