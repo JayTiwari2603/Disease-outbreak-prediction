@@ -20,7 +20,7 @@ with st.sidebar:
                            icons=['activity', 'heart', 'person'], 
                            default_index=0)
 
-# -------------------------------
+# -------------------------------stre
 # Diabetes Prediction Section
 # -------------------------------
 if selected == 'Diabetes Prediction':
